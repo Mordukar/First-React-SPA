@@ -4,10 +4,10 @@ import Message from './components/Message';
 function App() {
   return (
     <div className="App">
-      {/* <Message  
+      <Message  
         name="Evgen"
         text="This is my first application made on React"
-      /> */}
+      />
     </div>
   );
 }
