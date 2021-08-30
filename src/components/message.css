@@ -1,0 +1,12 @@
+.message {
+    padding: 100px;
+}
+
+.message__title{
+    margin-top: 0;
+    font-size: 56px;
+}
+
+.message__text{
+    font-size: 32px;
+}
