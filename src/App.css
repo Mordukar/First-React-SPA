@@ -1,8 +1,15 @@
 .App {
   text-align: center;
-  background-color: aqua;
   min-height: 100vh;
 }
+
+.form{
+  width: max-content;
+  margin: 0 auto;
+  padding: 100px;
+  border: 1px solid black;
+}
+
 
 
 
