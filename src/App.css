@@ -3,6 +3,20 @@
   min-height: 100vh;
 }
 
+.App__wrapper{
+  margin: 100px auto;
+  width: 800px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.App__item{
+  display: flex;
+  flex-direction: column;
+}
+
+
 .form{
   width: max-content;
   margin: 0 auto;
