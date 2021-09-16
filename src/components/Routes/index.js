@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter, Switch, Route, Link } from "react-router-dom";
 import { Home } from "../Pages/Home";
 import Chats from "../Pages/Chats";
-import { Profile } from "../Pages/Profile";
+import { Profile, ThemedProfile } from "../Pages/Profile";
 
 export const Routes = () => {
     return (
@@ -15,7 +15,7 @@ export const Routes = () => {
                     <Home/>
                 </Route>
                 <Route path="/profile" exact>
-                    <Profile/>
+                    <ThemedProfile theme={null} />
                 </Route>
                 <Route path="/chats/:chatId?">
                     <Chats/>
