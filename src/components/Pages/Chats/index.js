@@ -4,7 +4,7 @@ import {Form} from '../../Form';
 import { List, ListItem } from '@material-ui/core';
 import { AUTHORS } from '../../../utils/variables';
 import { useParams } from 'react-router';
-import { ChatList } from '../../ChatList';
+import { ChatList } from '../../ChatList/index';
 
 function Chats() {
 
