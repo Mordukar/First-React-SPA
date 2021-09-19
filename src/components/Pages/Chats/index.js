@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useHistory } from 'react';
 import Message from '../../Message';
 import {Form} from '../../Form';
 import { List, ListItem } from '@material-ui/core';
@@ -6,7 +6,7 @@ import { AUTHORS } from '../../../utils/variables';
 import { useParams } from 'react-router';
 import { ChatList } from '../../ChatList/index';
 
-function Chats() {
+function Chats(props) {
 
     const initialMessages = {
         "chat-1": [
@@ -21,7 +21,8 @@ function Chats() {
     {id: 'chat-2', name: "chat-2"}
   ]
 
-  const { chatId } = useParams()
+  const { chatId } = useParams();
+  const history = useHistory();
 
   const [messageList, setMessageList] = useState(initialMessages);
   const [chatList, setChatList] = useState(initialChats);
@@ -65,16 +66,52 @@ function Chats() {
     });
   }, [chatId, sendMessage])
 
+  const handleAddChat = useCallback((name)=> {
+    const id = `chat-${Date.now()}`;
+    setChatList((prevChats) => [
+      ...prevChats,
+      {
+        id,
+        name
+      }
+    ])
+
+    setMessageList((prevMess) => ({
+      ...prevMess,
+      [id]: []
+    }))
+  }, []);
+
+  const handleDeleteChat = useCallback((id) => {
+    const newChats = chatList.filter(chat => chat.id !== id);
+    setChatList(newChats);
+
+    const newMess = {...messageList};
+    delete newMess[id];
+
+    setMessageList(newMess);
+
+    if (chatId !== id) {
+      return;
+    }
+
+    if (newChats.length) {
+      history.push(`/chats/${chatList[0].id}`)
+    } else {
+      history.push(`/chats`);
+    }
+
+  }, [chatList, messageList, history])
+
 
   return (
     <div className="App">
 
-    
       <div className="App__wrapper">
 
-        <ChatList chats={chatList} onAddChat />
+        <ChatList chats={chatList} onAddChat={handleAddChat} onDeleteChat={handleDeleteChat} />
 
-        {!!chatId && 
+        {!!chatId && !!messageList[chatId] && (
             <div>  
                 <List>
                     {messageList[chatId]?.map((message) => (
@@ -95,7 +132,7 @@ function Chats() {
                     onSubmit={handleAddMessage}
                 />
             </div>  
-        }
+        )}
 
       </div>
 
