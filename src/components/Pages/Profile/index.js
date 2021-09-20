@@ -8,7 +8,6 @@ import { toggleShowName } from "../../../store/profile/actions";
 const withContext = (Component) => {
   return (props) => {
     const theme = useContext(ThemeContext);
-    console.log(theme)
     return <Component {...props} theme={theme} />;
   };
 };

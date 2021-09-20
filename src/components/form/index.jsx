@@ -19,16 +19,16 @@ export const Form = ({ onSubmit }) => {
 
     return (
         <form className="form" onSubmit={handleSubmit}>
-        <div>Введите сообщение:</div>
-        <TextField
-          color="primary"
-          placeholder="message"
-          label="Label"
-          value={value}
-          onChange={handleChange}
-          inputRef={inputRef}
-        />
-        <Button className="button" type="submit">Submit</Button>
+          <div>Введите сообщение:</div>
+          <TextField
+            color="primary"
+            placeholder="message"
+            label="Label"
+            value={value}
+            onChange={handleChange}
+            inputRef={inputRef}
+          />
+          <Button variant="outlined" className="button" type="submit">Submit</Button>
       </form>
     );
 }

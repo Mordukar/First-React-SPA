@@ -1,16 +1,33 @@
-import React from 'react'
-import { List, ListItem } from "@material-ui/core"
+import { useState } from 'react'
+import { List, ListItem, Button } from "@material-ui/core"
 import { Link } from "react-router-dom"
+import { ChatItem } from '../ChatItem';
 
-export const ChatList = ({ chats }) => {
+
+export const ChatList = ({ chats, onDeleteChat, onAddChat }) => {
+  const [value, setValue] = useState('');
+
+  const handleChange = (e) => {
+    setValue(e.target.value);
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (value) {
+      onAddChat(value);
+      setValue('');
+    }
+  }
+
     return (
       <List>
         {chats.map((chat) => (
-          <ListItem key={chat.id}>
-            <Link to={`/chats/${chat.id}`}>{chat.name}</Link>
-          </ListItem>
+          <ChatItem chat={chat} key={chat.id} id={chat.id} onDelete={onDeleteChat} />
         ))}
-        {/* <button>Add chat</button> */}
+        <form onSubmit={handleSubmit}> 
+          <input type="text" value={value} onChange={handleChange}/>
+          <Button type="submit" varinat="outlined" disabled={!value}>Add chat</Button>
+        </form>
       </List>
     );
   };
