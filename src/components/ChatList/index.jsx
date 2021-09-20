@@ -14,7 +14,8 @@ export const ChatList = ({ chats, onDeleteChat, onAddChat }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (value) {
-      onAddChat(value)
+      onAddChat(value);
+      setValue('');
     }
   }
 

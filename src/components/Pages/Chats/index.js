@@ -1,54 +1,51 @@
-import { useEffect, useState, useCallback, useHistory } from 'react';
-import Message from '../../Message';
-import {Form} from '../../Form';
+import { useEffect, useState, useCallback } from 'react';
 import { List, ListItem } from '@material-ui/core';
 import { AUTHORS } from '../../../utils/variables';
-import { useParams } from 'react-router';
+import { useParams, useHistory } from 'react-router';
+import { useDispatch, useSelector } from 'react-redux';
+
 import { ChatList } from '../../ChatList/index';
+import Message from '../../Message';
+import {Form} from '../../Form';
+import { addChat, deleteChat } from '../../../store/chats/actions'
+import { addMessage } from '../../../store/messages/actions';
+
 
 function Chats(props) {
 
-    const initialMessages = {
-        "chat-1": [
-          { text: "nnnn", author: "HUMAN", id: "mess-2" },
-          { text: "nnnn", author: "HUMAN", id: "mess-1" },
-        ],
-        "chat-2": [],
-      };
+    // const initialMessages = {
+    //   "chat-1": [
+    //     { text: "nnnn", author: "HUMAN", id: "mess-2" },
+    //     { text: "nnnn", author: "HUMAN", id: "mess-1" },
+    //   ],
+    //   "chat-2": [],
+    // };
 
-  const initialChats = [
-    {id: 'chat-1', name: "chat-1"},
-    {id: 'chat-2', name: "chat-2"}
-  ]
+  // const initialChats = [
+  //   {id: 'chat-1', name: "chat-1"},
+  //   {id: 'chat-2', name: "chat-2"}
+  // ]
 
   const { chatId } = useParams();
   const history = useHistory();
+  const dispatch = useDispatch();
 
-  const [messageList, setMessageList] = useState(initialMessages);
-  const [chatList, setChatList] = useState(initialChats);
+  // const [messageList, setMessageList] = useState(initialMessages);
+  // const [chatList, setChatList] = useState(initialChats);
+  const messages = useSelector(state => state.messages.messages)
+  const chats = useSelector(state => state.chats.chats)
 
-  const sendMessage = useCallback((message) => {
-    setMessageList((prevMess) => ({
-        ...prevMess,
-            [chatId]: [ 
-                ...prevMess[chatId],
-                message,
-            ],
-        }));
+  const sendMessage = useCallback((text, author) => {
+    dispatch(addMessage(chatId, text, author))
   }, [chatId])
   
   useEffect(() => {
-    const currentMess = messageList[chatId];
+    const currentMess = messages[chatId];
 
     if (chatId && currentMess?.[currentMess.length - 1]?.author === AUTHORS.HUMAN) {
       
       const timeout = setTimeout(() => {
-        sendMessage({ 
-            id: `mess-${Date.now()}`, 
-            text: "I am bot", 
-            author: AUTHORS.BOT, 
-            value: '' 
-        })
+        sendMessage("I am bot", AUTHORS.BOT)
       }, 1500)
 
       return () => {
@@ -56,52 +53,31 @@ function Chats(props) {
       };
       
     }
-  }, [messageList]);
+  }, [messages]);
 
   const handleAddMessage = useCallback((text) => {
-    sendMessage({
-        text,
-        author: AUTHORS.HUMAN,
-        id: `mess-${Date.now()}`
-    });
+    sendMessage(text, AUTHORS.HUMAN);
   }, [chatId, sendMessage])
 
   const handleAddChat = useCallback((name)=> {
-    const id = `chat-${Date.now()}`;
-    setChatList((prevChats) => [
-      ...prevChats,
-      {
-        id,
-        name
-      }
-    ])
-
-    setMessageList((prevMess) => ({
-      ...prevMess,
-      [id]: []
-    }))
-  }, []);
+    dispatch(addChat(name))
+  }, [dispatch]);
 
   const handleDeleteChat = useCallback((id) => {
-    const newChats = chatList.filter(chat => chat.id !== id);
-    setChatList(newChats);
 
-    const newMess = {...messageList};
-    delete newMess[id];
-
-    setMessageList(newMess);
+    dispatch(deleteChat(id))
 
     if (chatId !== id) {
       return;
     }
 
-    if (newChats.length) {
-      history.push(`/chats/${chatList[0].id}`)
+    if (chats.length === 1) {
+      history.push(`/chats/${chats[0].id}`)
     } else {
       history.push(`/chats`);
     }
 
-  }, [chatList, messageList, history])
+  }, [history, dispatch, chats, chatId])
 
 
   return (
@@ -109,12 +85,12 @@ function Chats(props) {
 
       <div className="App__wrapper">
 
-        <ChatList chats={chatList} onAddChat={handleAddChat} onDeleteChat={handleDeleteChat} />
+        <ChatList chats={chats} onAddChat={handleAddChat} onDeleteChat={handleDeleteChat} />
 
-        {!!chatId && !!messageList[chatId] && (
+        {!!chatId && !!messages[chatId] && (
             <div>  
                 <List>
-                    {messageList[chatId]?.map((message) => (
+                    {messages[chatId]?.map((message) => (
                         <ListItem
                         key={message.id}  
                         >
