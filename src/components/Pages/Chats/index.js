@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { List, ListItem } from '@material-ui/core';
 import { AUTHORS } from '../../../utils/variables';
 import { useParams, useHistory } from 'react-router';
@@ -80,6 +80,9 @@ function Chats(props) {
   }, [history, dispatch, chats, chatId])
 
 
+  const chatExists = useMemo(() => !!chats.find(({id}) => id === chatId), [chatId, chats]);
+
+
   return (
     <div className="App">
 
@@ -87,10 +90,10 @@ function Chats(props) {
 
         <ChatList chats={chats} onAddChat={handleAddChat} onDeleteChat={handleDeleteChat} />
 
-        {!!chatId && !!messages[chatId] && (
+        {!!chatId && chatExists && (
             <div>  
                 <List>
-                    {messages[chatId]?.map((message) => (
+                    {(messages[chatId] || [])?.map((message) => (
                         <ListItem
                         key={message.id}  
                         >
