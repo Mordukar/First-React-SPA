@@ -1,33 +1,18 @@
-import { useState } from 'react'
-import { List, ListItem, Button } from "@material-ui/core"
+import { List } from "@material-ui/core"
+import { ChatBubbleOutlineRounded } from "@material-ui/icons";
 import { Link } from "react-router-dom"
 import { ChatItem } from '../ChatItem';
+import FormAddChat from '../FormAddChat';
 
 
-export const ChatList = ({ chats, onDeleteChat, onAddChat }) => {
-  const [value, setValue] = useState('');
-
-  const handleChange = (e) => {
-    setValue(e.target.value);
-  }
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (value) {
-      onAddChat(value);
-      setValue('');
-    }
-  }
+export const ChatList = ({ chats, chatId }) => {
 
     return (
       <List>
         {chats.map((chat) => (
-          <ChatItem chat={chat} key={chat.id} id={chat.id} onDelete={onDeleteChat} />
+          <ChatItem chatId={chatId} chats={ chats } chat={chat} key={chat.id} id={chat.id} />
         ))}
-        <form onSubmit={handleSubmit}> 
-          <input type="text" value={value} onChange={handleChange}/>
-          <Button type="submit" varinat="outlined" disabled={!value}>Add chat</Button>
-        </form>
+        <FormAddChat/>
       </List>
     );
   };
