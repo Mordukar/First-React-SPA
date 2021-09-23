@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useCallback, useMemo } from 'react';
 import { List, ListItem } from '@material-ui/core';
 import { AUTHORS } from '../../../utils/variables';
 import { useParams } from 'react-router';
@@ -7,43 +7,30 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ChatList } from '../../ChatList/index';
 import Message from '../../Message';
 import {Form} from '../../Form';
-import { addMessage } from '../../../store/messages/actions';
+import { addMessageWithReply } from '../../../store/messages/actions';
+import { selectIfChatExist } from '../../../store/chats/selectors';
 
 
 function Chats(props) {
 
   const { chatId } = useParams();
-  // const history = useHistory();
   const dispatch = useDispatch();
 
   const messages = useSelector(state => state.messages.messages)
   const chats = useSelector(state => state.chats.chats)
 
+  const selectChatExists = useMemo(() => selectIfChatExist(chatId), [chatId]);
+
+  const chatExists = useSelector(selectChatExists);
+
   const sendMessage = useCallback((text, author) => {
-    dispatch(addMessage(chatId, text, author))
+    dispatch(addMessageWithReply(chatId, text, author))
   }, [chatId])
-  
-  useEffect(() => {
-    const currentMess = messages[chatId];
-
-    if (chatId && currentMess?.[currentMess.length - 1]?.author === AUTHORS.HUMAN) {
-      
-      const timeout = setTimeout(() => {
-        sendMessage("I am bot", AUTHORS.BOT)
-      }, 1500)
-
-      return () => {
-        clearTimeout(timeout);
-      };
-      
-    }
-  }, [messages]);
 
   const handleAddMessage = useCallback((text) => {
     sendMessage(text, AUTHORS.HUMAN);
   }, [chatId, sendMessage])
 
-  const chatExists = useMemo(() => !!chats.find(({id}) => id === chatId), [chatId, chats]);
 
   return (
     <div className="App">
