@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { ThemeContext } from "../../../utils/ThemeContext";
 // import { store } from "../../../store";
 import { toggleShowName } from "../../../store/profile/actions";
+import { useEffect } from "react";
 
 
 const withContext = (Component) => {
@@ -12,13 +13,21 @@ const withContext = (Component) => {
   };
 };
 
-export const Profile = ({ theme }) => {
+export const Profile = ({ theme, onLogout}) => {
+  const [value, setValue] = useState("");
+  const [name, setName] = useState("");
+
   const showName = useSelector((state) => state.showName);
   const dispatch = useDispatch();
 
   const handleClick = () => {
-    dispatch(toggleShowName);
+    onLogout
+    // dispatch(toggleShowName);
   };
+
+  useEffect(() => {
+    
+  })
   
   return (
     <>
