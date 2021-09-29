@@ -1,12 +1,14 @@
 import React from "react";
+import { useEffect, useState } from "react";
 import { BrowserRouter, Switch, Route, Link } from "react-router-dom";
 import { Home } from "../Pages/Home";
 import Chats from "../Pages/Chats";
-import { Profile, ThemedProfile } from "../Pages/Profile";
+import { ThemedProfile } from "../Pages/Profile";
 import { News } from "../Pages/News/index";
 import { PublicRoute } from "../Routes/PublicRoute";
 import { PrivateRoute } from "../Routes/PrivateRoute";
 import { onAuthStateChanged } from "@firebase/auth";
+import { signOut, signUp, auth, login } from "../../services/firebase";
 
 
 export const Routes = () => {
@@ -27,7 +29,6 @@ export const Routes = () => {
     const handleLogin = async (email, pass) => {
         try {
             await login(email, pass);
-            setAuthed(true);
         } catch (e) {
             console.log(e);
         }
@@ -43,7 +44,7 @@ export const Routes = () => {
 
     const handleLogout = async () => {
         try {
-            await signOut(email, pass);
+            await signOut();
         } catch (e) {
             console.log(e);
         }

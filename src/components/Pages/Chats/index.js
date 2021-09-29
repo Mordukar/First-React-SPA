@@ -16,20 +16,65 @@ function Chats(props) {
   const { chatId } = useParams();
   const dispatch = useDispatch();
 
-  const messages = useSelector(state => state.messages.messages)
-  const chats = useSelector(state => state.chats.chats)
+  const [chats, setChats] = useState([]);
+  const [messages, setMessages] = useState([]);
 
-  const selectChatExists = useMemo(() => selectIfChatExist(chatId), [chatId]);
+  const unsubscribeMessages = useRef(null)
 
-  const chatExists = useSelector(selectChatExists);
+  useEffect(() => {
+    const chatsDbRef = ref(db, "chats");
+    onValue(chatsDbRef, (snapshot) => {
+      const data = snapshot.val();
+      setChats(Object.values(data || {}));
+    });
+  }, []);
 
-  const sendMessage = useCallback((text, author) => {
-    dispatch(addMessageWithReply(chatId, text, author))
+  useEffect(() => {
+    if (unsubscribeMessages.current) {
+      unsubscribeMessages.current();
+    }
+    const messagesDbRef = ref(db, `messages/${chatdId}`);
+    const unsubscribe = onValue(messagesDbRef, (snapshot) => {
+      const data = snapshot.val();
+      setMessages(Object.values(data || {}));
+    });
+
+    unsubscribeMessages.current = unsubscribe;
+
+    return () => unsubscribe();
+
+  }, [chatId]);
+
+  // const messages = useSelector(state => state.messages.messages)
+  // const chats = useSelector(state => state.chats.chats)
+
+  // const selectChatExists = useMemo(() => selectIfChatExist(chatId), [chatId]);
+
+  // const chatExists = useSelector(selectChatExists);
+
+  const sendMessage = useCallback(
+    (text, author) => {
+      const newId = `messages-${Date.now()}`;
+      const messagesDbRef = ref(db,  `messages/${chatId}/${newId}`);
+      set(messagesDbRef, {
+        author,
+        text,
+        id: newId
+      });
+    // dispatch(addMessageWithReply(chatId, text, author))
   }, [chatId])
 
-  const handleAddMessage = useCallback((text) => {
-    sendMessage(text, AUTHORS.HUMAN);
-  }, [chatId, sendMessage])
+  const handleAddMessage = useCallback(
+    (text) => {
+      sendMessage(text, AUTHORS.HUMAN);
+    }, 
+    [sendMessage]
+  );
+
+  const chatExist = useMemo(() => chats.find(({ id }) => id === chatId), [
+    chatId,
+    chats
+  ])
 
 
   return (
@@ -42,18 +87,18 @@ function Chats(props) {
         {!!chatId && chatExists && (
             <div>  
                 <List>
-                    {(messages[chatId] || [])?.map((message) => (
-                        <ListItem
+                  {(messages || [])?.map((message) => (
+                      <ListItem
                         key={message.id}  
-                        >
+                      >
                         <Message
                             author={message.author}
                             text={message.text}
                             value={message.value}
                         />
-                        </ListItem>
-                        ))
-                    }
+                      </ListItem>
+                    ))
+                  }
                 </List>
 
                 <Form
