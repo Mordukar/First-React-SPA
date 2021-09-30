@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState, useRef, useMemo } from 'react';
+import { useEffect, useCallback, useState, useRef, useMemo, useSelector } from 'react';
 import { List, ListItem } from '@material-ui/core';
 import { AUTHORS } from '../../../utils/variables';
 import { useParams } from 'react-router';
@@ -9,7 +9,8 @@ import { ref, set, onValue } from "firebase/database";
 import { ChatList } from '../../ChatList/index';
 import Message from '../../Message';
 import {Form} from '../../Form';
-import { addMessageWithReply } from '../../../store/messages/actions';
+import { addMessageFb, initMessages } from '../../../store/messages/actions';
+import { initChats } from '../../../store/chats/actions';
 import { selectIfChatExist } from '../../../store/chats/selectors';
 
 
@@ -18,52 +19,21 @@ function Chats(props) {
   const { chatId } = useParams();
   const dispatch = useDispatch();
 
-  const [chats, setChats] = useState([]);
-  const [messages, setMessages] = useState([]);
-
-  const unsubscribeMessages = useRef(null)
-
   useEffect(() => {
     const chatsDbRef = ref(db, "chats");
-    onValue(chatsDbRef, (snapshot) => {
-      const data = snapshot.val();
-      setChats(Object.values(data || {}));
-    });
+    dispatch(initChats())
+    dispatch(initMessages())
   }, []);
 
-  useEffect(() => {
-    if (unsubscribeMessages.current) {
-      unsubscribeMessages.current();
-    }
-    const messagesDbRef = ref(db, `messages/${chatId}`);
-    const unsubscribe = onValue(messagesDbRef, (snapshot) => {
-      const data = snapshot.val();
-      setMessages(Object.values(data || {}));
-    });
+  const messages = useSelector((state) => state.messages.messages)
 
-    unsubscribeMessages.current = unsubscribe;
+  const selectChatExists = useMemo(() => selectIfChatExist(chatId), [chatId]);
 
-    return () => unsubscribe();
-
-  }, [chatId]);
-
-  // const messages = useSelector(state => state.messages.messages)
-  // const chats = useSelector(state => state.chats.chats)
-
-  // const selectChatExists = useMemo(() => selectIfChatExist(chatId), [chatId]);
-
-  // const chatExists = useSelector(selectChatExists);
+  const chatExists = useSelector(selectChatExists);
 
   const sendMessage = useCallback(
     (text, author) => {
-      const newId = `messages-${Date.now()}`;
-      const messagesDbRef = ref(db,  `messages/${chatId}/${newId}`);
-      set(messagesDbRef, {
-        author,
-        text,
-        id: newId
-      });
-    // dispatch(addMessageWithReply(chatId, text, author))
+    dispatch(addMessageFb(text, author, chatId))
   }, [chatId])
 
   const handleAddMessage = useCallback(
@@ -73,23 +43,17 @@ function Chats(props) {
     [sendMessage]
   );
 
-  const chatExists = useMemo(() => chats.find(({ id }) => id === chatId), [
-    chatId,
-    chats
-  ])
-
-
   return (
     <div className="App">
 
       <div className="App__wrapper">
 
-        <ChatList chatId={chatId} chats={chats} />
+        <ChatList />
 
         {!!chatId && chatExists && (
             <div>  
                 <List>
-                  {(messages || [])?.map((message) => (
+                  {(Object.values(messages[chatId] || {}) || [])?.map((message) => (
                       <ListItem
                         key={message.id}  
                       >
