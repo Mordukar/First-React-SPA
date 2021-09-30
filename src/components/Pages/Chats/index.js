@@ -1,8 +1,10 @@
-import { useEffect, useCallback, useMemo } from 'react';
+import { useEffect, useCallback, useState, useRef, useMemo } from 'react';
 import { List, ListItem } from '@material-ui/core';
 import { AUTHORS } from '../../../utils/variables';
 import { useParams } from 'react-router';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { db } from "../../../services/firebase";
+import { ref, set, onValue } from "firebase/database";
 
 import { ChatList } from '../../ChatList/index';
 import Message from '../../Message';
@@ -33,7 +35,7 @@ function Chats(props) {
     if (unsubscribeMessages.current) {
       unsubscribeMessages.current();
     }
-    const messagesDbRef = ref(db, `messages/${chatdId}`);
+    const messagesDbRef = ref(db, `messages/${chatId}`);
     const unsubscribe = onValue(messagesDbRef, (snapshot) => {
       const data = snapshot.val();
       setMessages(Object.values(data || {}));
@@ -71,7 +73,7 @@ function Chats(props) {
     [sendMessage]
   );
 
-  const chatExist = useMemo(() => chats.find(({ id }) => id === chatId), [
+  const chatExists = useMemo(() => chats.find(({ id }) => id === chatId), [
     chatId,
     chats
   ])
