@@ -9,17 +9,17 @@ export const SET_MESSAGES = "MESSAGES::SET_MESSAGES";
 export const addMessage = (chatId, text, author) => ({
     type: ADD_MESSAGE,
     payload: {
-        chatId,
-        text,
-        author
+      chatId,
+      text,
+      author
     }
 })
 
 export const deleteMessage = (chatId, id) => ({
     type: DELETE_MESSAGE,
     payload: {
-        chatId,
-        id
+      chatId,
+      id
     }
 })
 

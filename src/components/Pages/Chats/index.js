@@ -12,9 +12,10 @@ import {Form} from '../../Form';
 import { addMessageFb, initMessages } from '../../../store/messages/actions';
 import { initChats } from '../../../store/chats/actions';
 import { selectIfChatExist } from '../../../store/chats/selectors';
+import { selectMessages } from '../../../store/messages/selectors';
 
 
-function Chats(props) {
+function Chats() {
 
   const { chatId } = useParams();
   const dispatch = useDispatch();
@@ -25,7 +26,7 @@ function Chats(props) {
     dispatch(initMessages())
   }, []);
 
-  const messages = useSelector((state) => state.messages.messages)
+  const messages = useSelector(selectMessages);
 
   const selectChatExists = useMemo(() => selectIfChatExist(chatId), [chatId]);
 

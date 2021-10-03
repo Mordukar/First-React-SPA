@@ -3,7 +3,7 @@ import { DELETE_MESSAGE } from "./actions"
 import { DELETE_CHAT, ADD_CHAT } from "../chats/actions"
 
 const initialState = {
-    messages: []
+    messages: {}
 }
 
 export const messagesReducer = (state = initialState, {type, payload}) => {
