@@ -1,8 +1,9 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { ref, set, onValue } from "firebase/database";
 import { ThemeContext } from "../../../utils/ThemeContext";
-// import { store } from "../../../store";
 import { toggleShowName } from "../../../store/profile/actions";
+import { db } from "../../../services/firebase";
 
 
 const withContext = (Component) => {
@@ -12,25 +13,48 @@ const withContext = (Component) => {
   };
 };
 
-export const Profile = ({ theme }) => {
+export const Profile = ({ theme, onLogout}) => {
+  const [value, setValue] = useState("");
+  const [name, setName] = useState("");
+
   const showName = useSelector((state) => state.showName);
   const dispatch = useDispatch();
 
   const handleClick = () => {
-    dispatch(toggleShowName);
+    onLogout();
   };
+
+  useEffect(() => {
+    const userDbRef = ref(db, "user");
+    onValue(userDbRef, (snapshot) => {
+      const data = snapshot.val();
+      setName(data?.username || '');
+    });
+  }, []);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setValue("");
+    set(ref(db, "user"), {
+      username: value,
+    });
+  }
+
+  const handleChange = (e) => {
+    setValue(e.target.value);
+  }
   
   return (
     <>
     
-      <button onClick={theme?.changeTheme}>Toggle theme</button>
+      <button onClick={handleClick}>Logout</button>
       
-      <div>
-        <span>Показать имя пользователя</span>
-        <input onClick={handleClick} type='checkbox'></input>
-      </div>
+      <form onSubmit={handleSubmit}>
+        <input type="text" value={value} onChange={handleChange}/>
+        <button type="submit">Submit</button>
+      </form>
       
-      {showName && <div>Show name is true</div>}
+      <div>{name}</div>
 
       <h3 style={{ color: theme?.theme === "light" ? "red" : "black" }}>
         This is profile page
