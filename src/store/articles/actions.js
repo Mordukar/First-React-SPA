@@ -4,16 +4,16 @@ export const GET_ARTICLES_PENDING = "ARTICLES::GET_PENDING";
 export const GET_ARTICLES_SUCCESS = "ARTICLES::GET_SUCCESS";
 export const GET_ARTICLES_FAILURE = "ARTICLES::GET_FAILURE";
 
-const getArticlesPending = () => ({
+export const getArticlesPending = () => ({
   type: GET_ARTICLES_PENDING,
 });
 
-const getArticlesSuccess = (articles) => ({
+export const getArticlesSuccess = (articles) => ({
   type: GET_ARTICLES_SUCCESS,
   payload: articles,
 });
 
-const getArticlesFailure = (error) => ({
+export const getArticlesFailure = (error) => ({
   type: GET_ARTICLES_FAILURE,
   payload: error,
 });
